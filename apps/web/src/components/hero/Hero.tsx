@@ -7,7 +7,7 @@ const HeroCanvas = dynamic(() => import("./HeroCanvas"), { ssr: false });
 
 export default function Hero() {
   return (
-    <section className="min-h-screen relative h-[80vh] min-h-[560px] overflow-hidden bg-gradient-to-br from-gray-950 via-black to-gray-900">
+    <section className="min-h-screen relative h-[80vh] overflow-hidden bg-gradient-to-br from-gray-950 via-black to-gray-900">
       {/* 3D */}
       <HeroCanvas />
 
@@ -36,7 +36,7 @@ export default function Hero() {
               View Projects
             </a>
             <a
-              href="/experience"
+              href="#experience"
               className="px-5 py-2 rounded-xl border border-white/30 text-white hover:bg-white/10 transition"
             >
               Experience

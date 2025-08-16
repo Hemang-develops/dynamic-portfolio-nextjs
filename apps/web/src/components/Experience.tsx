@@ -3,35 +3,49 @@ import { motion } from "framer-motion";
 
 const experiences = [
   {
-    role: "Full Stack Developer",
-    company: "Tech Solutions Ltd.",
-    period: "2022 – Present",
-    description: "Built scalable apps with React, Next.js, Node.js & Django.",
+    role: "Software Engineer",
+    company: "Searce",
+    period: "October 2024 – Present",
+    description: [
+      "Designed and implemented a dynamic Angular form engine supporting 10+ configurable input types",
+      "Refactored duplicated UI logic into reusable components, reducing code duplication by 15%",
+      "Built a role-based attribute mapping system using TypeScript enums and typed objects",
+      "Developed a tab-based filtering interface with 4 to 6 filters per tab",
+      "Integrated Google Cloud Functions with Secret Manager and Pub/Sub for automation",
+    ],
   },
   {
-    role: "Frontend Developer",
-    company: "Innovate Labs",
-    period: "2020 – 2021",
-    description: "Created responsive UI components, boosted performance by 30%.",
+    role: "Digital Specialist Engineer",
+    company: "Infosys",
+    period: "August 2021 - September 2024",
+    description: [
+      "Developed high-quality front-end code using ReactJS, Angular, HTML, CSS, and TypeScript",
+      "Successfully delivered 20+ stories on time using Agile SDLC methodology",
+      "Provided technical assistance and maintenance support for 50+ defects",
+      "Utilized GitHub projects for effective tracking of 30+ user stories",
+      "Collaborated with Jira to test 15+ new pages/features",
+    ],
   },
-//   {
-//     role: "Software Engineer Intern",
-//     company: "Startup Hub",
-//     period: "2019 – 2020",
-//     description: "Assisted in Django apps, wrote tests, contributed to CI/CD.",
-//   },
+  //   {
+  //     role: "Software Engineer Intern",
+  //     company: "Startup Hub",
+  //     period: "2019 – 2020",
+  //     description: "Assisted in Django apps, wrote tests, contributed to CI/CD.",
+  //   },
 ];
 
 export default function ExperienceSection() {
   return (
-    <section id="experience" className="min-h-screen relative bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white py-20">
+    <section
+      id="experience"
+      className="min-h-screen relative bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white py-20"
+    >
       <h2 className="text-4xl font-bold text-center mb-16">Experience</h2>
 
       <div className="relative max-w-4xl mx-auto">
         {/* Vertical Line */}
         <div className="absolute left-1/2 transform -translate-x-1/2 w-1 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 h-full rounded-full" />
 
-        {/* Timeline Cards */}
         <div className="space-y-20">
           {experiences.map((exp, idx) => (
             <motion.div
@@ -52,7 +66,22 @@ export default function ExperienceSection() {
                   </h3>
                   <p className="text-gray-300">{exp.company}</p>
                   <p className="text-sm text-gray-400">{exp.period}</p>
-                  <p className="mt-3 text-gray-400">{exp.description}</p>
+                  <ul className="mt-4 text-gray-400 list-disc list-inside space-y-2">
+                    {exp.description.map((desc, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: idx * 0.2 }}
+                        viewport={{ once: true }}
+                        className={`relative flex items-center ${
+                          idx % 2 === 0 ? "justify-start" : "justify-end"
+                        }`}
+                      >
+                        <li key={i}>{desc}</li>
+                      </motion.div>
+                    ))}
+                  </ul>
                 </div>
               </div>
 
