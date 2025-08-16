@@ -1,0 +1,19 @@
+{
+  "name": "portfolio-monorepo",
+  "preview": {
+    "ports": [
+      {
+        "id": "web",
+        "port": 3000,
+        "title": "Portfolio",
+        "run": "npm run dev:web"
+      },
+      {
+        "id": "admin",
+        "port": 3001,
+        "title": "Admin Dashboard",
+        "run": "npm run dev:admin"
+      }
+    ]
+  }
+}
