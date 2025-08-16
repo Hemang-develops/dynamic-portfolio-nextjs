@@ -1,13 +1,15 @@
 {
   "private": true,
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "devDependencies": {
+    "@next/swc-wasm-nodejs": "^15.4.6",
     "concurrently": "^8.2.2"
   },
   "scripts": {
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:admin\"",
-    "dev:web": "cd apps/web && next dev --turbo -p 3000",
-    "dev:admin": "cd apps/admin && next dev --turbo -p 3001",
-    "start": "npm run dev"
-  }
+    "dev:web": "cd apps/web && next dev -p 3000",
+    "dev:admin": "cd apps/admin && next dev -p 3001"
+  }  
 }

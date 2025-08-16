@@ -1,19 +1,17 @@
 {
-  "name": "portfolio-monorepo",
+  "title": "Dynamic Portfolio",
+  "description": "Next.js monorepo with Web (Portfolio) + Admin Dashboard",
+  "defaultUrl": "http://localhost:3000",
   "preview": {
-    "ports": [
-      {
-        "id": "web",
-        "port": 3000,
-        "title": "Portfolio",
-        "run": "npm run dev:web"
-      },
-      {
-        "id": "admin",
-        "port": 3001,
-        "title": "Admin Dashboard",
-        "run": "npm run dev:admin"
-      }
-    ]
+    "web": {
+      "command": "npm run dev:web",
+      "url": "http://localhost:3000",
+      "show": true
+    },
+    "admin": {
+      "command": "npm run dev:admin",
+      "url": "http://localhost:3001",
+      "show": true
+    }
   }
 }
