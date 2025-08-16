@@ -7,7 +7,7 @@ const HeroCanvas = dynamic(() => import("./HeroCanvas"), { ssr: false });
 
 export default function Hero() {
   return (
-    <section className="relative h-[80vh] min-h-[560px] overflow-hidden bg-gradient-to-br from-gray-950 via-black to-gray-900">
+    <section className="min-h-screen relative h-[80vh] min-h-[560px] overflow-hidden bg-gradient-to-br from-gray-950 via-black to-gray-900">
       {/* 3D */}
       <HeroCanvas />
 

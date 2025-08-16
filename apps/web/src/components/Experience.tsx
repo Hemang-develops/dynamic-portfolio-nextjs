@@ -24,7 +24,7 @@ const experiences = [
 
 export default function ExperienceSection() {
   return (
-    <section className="relative bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white py-20">
+    <section id="experience" className="min-h-screen relative bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white py-20">
       <h2 className="text-4xl font-bold text-center mb-16">Experience</h2>
 
       <div className="relative max-w-4xl mx-auto">
@@ -45,7 +45,7 @@ export default function ExperienceSection() {
               }`}
             >
               {/* Card */}
-              <div className="w-1/2">
+              <div className="w-1/2 px-8">
                 <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-xl p-6 transition-transform">
                   <h3 className="text-2xl font-semibold text-blue-400">
                     {exp.role}
