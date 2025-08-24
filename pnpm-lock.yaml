@@ -874,7 +874,8 @@ packages:
 
   /@tailwindcss/oxide@4.1.12:
     resolution: {integrity: sha512-gM5EoKHW/ukmlEtphNwaGx45fGoEmP10v51t9unv55voWh6WrOL19hfuIdo2FjxIaZzw776/BUQg7Pck++cIVw==}
-    engines: {node: '>=14.0.0'}
+    engines: {node: '>= 10'}
+    requiresBuild: true
     dependencies:
       detect-libc: 2.0.4
       tar: 7.4.3

@@ -7,7 +7,6 @@ import {
   MeshDistortMaterial,
   Environment,
 } from "@react-three/drei";
-import Image from "next/image";
 
 function Blob() {
   return (

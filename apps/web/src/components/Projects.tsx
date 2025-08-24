@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 type Project = {
@@ -57,16 +57,11 @@ const PROJECTS: Project[] = [
       "A sleek movie discovery app with dynamic routing, debounced search, genre filters, and persistent watchlists. Optimized for snappy loads and smooth transitions.",
     tech: ["React", "Next.js", "TailwindCSS", "Framer Motion", "TMDB API"],
     cta: { label: "View Live", href: "https://react-movie-store.vercel.app" },
-    // media: {
-    //   type: "video",
-    //   src: "/projects/react-movie-store.mov",
-    //   poster: "/projects/react-movie-store.png",
-    // },
     media: {
-        type: "image",
-        src: "/projects/react-movie-store.png",
-        alt: "React movie store",
-      },
+      type: "video",
+      src: "/projects/react-movie-store.mov",
+      poster: "/projects/react-movie-store.png",
+    },
   },
   {
     title: "Angular E-commerce",
@@ -112,34 +107,6 @@ const PROJECTS: Project[] = [
   //   },
 ];
 
-function ParallaxMedia({
-  children,
-  strength = 120,
-}: {
-  children: React.ReactNode;
-  strength?: number;
-}) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const y = useTransform(scrollYProgress, [0, 1], [-strength, strength]);
-  return (
-    <motion.div ref={ref} style={{ y }} className="relative w-full h-full">
-      {children}
-    </motion.div>
-  );
-}
-
-function TechPill({ label }: { label: string }) {
-  return (
-    <span className="px-3 py-1 rounded-full bg-white/10 text-xs md:text-sm text-gray-200 border border-white/20">
-      {label}
-    </span>
-  );
-}
-
 function CaseStudy({ project, index }: { project: Project; index: number }) {
   const isEven = index % 2 === 0;
   const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
@@ -155,35 +122,6 @@ function CaseStudy({ project, index }: { project: Project; index: number }) {
   };
   const onLeave = () => setTilt({ rx: 0, ry: 0 });
 
-  // --- VIDEO hover/focus control ---
-  const handleMouseEnter = () => {
-    if (videoRef.current) videoRef.current.play().catch(() => {});
-  };
-  const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
-  const handleFocus = () => {
-    if (videoRef.current) videoRef.current.play().catch(() => {});
-  };
-  const handleBlur = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
-  // Optional: tap-to-play for touch devices
-  const handleTouchStart = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play().catch(() => {});
-    } else {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
   const [isPlaying, setIsPlaying] = useState(false);
 
   const play = () => {
