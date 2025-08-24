@@ -72,6 +72,7 @@ export default function Hero() {
             <img
               src="/profileImage.png"
               className="relative w-80 h-80 lg:w-96 lg:h-96 rounded-full object-cover shadow-2xl border-4 border-white/10"
+              alt="Profile picture"
             />
           </div>
         </div>

@@ -46,9 +46,10 @@ export default function Contacts() {
       setName("");
       setEmail("");
       setMessage("");
-    } catch (e: any) {
+    } catch (e: unknown) {
       setState("error");
-      setErr(e?.message ?? "Failed to send. Try again.");
+      const msg = e instanceof Error ? e.message : "Failed to send. Try again.";
+      setErr(msg);
     } finally {
       setTimeout(() => setState("idle"), 4000);
     }
@@ -84,8 +85,8 @@ export default function Contacts() {
           Let’s build something great
         </motion.h2>
         <p className="text-center text-gray-300 max-w-2xl mx-auto mb-14">
-          Have an opportunity, idea, or problem to solve? Send a note—I'll reply
-          within 24 hours.
+          Have an opportunity, idea, or problem to solve? Send a note—I will
+          reply within 24 hours.
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
