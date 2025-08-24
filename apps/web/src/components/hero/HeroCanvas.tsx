@@ -7,6 +7,7 @@ import {
   MeshDistortMaterial,
   Environment,
 } from "@react-three/drei";
+import Image from "next/image";
 
 function Blob() {
   return (
@@ -29,23 +30,21 @@ function Blob() {
 
 export default function HeroCanvas() {
   return (
-    <div className="absolute inset-0">
-       <Canvas
-    camera={{ position: [0, 0, 6], fov: 50 }}
-    dpr={[1, 1.5]}
-    gl={{ antialias: true, preserveDrawingBuffer: true }}
-  >
-        <ambientLight intensity={0.7} />
-        <directionalLight position={[4, 4, 6]} intensity={1} />
-        <Blob />
-        <Environment preset="city" />
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          autoRotate
-          autoRotateSpeed={0.6}
-        />
-      </Canvas>
-    </div>
+    <Canvas
+      camera={{ position: [0, 0, 6], fov: 50 }}
+      dpr={[1, 1.5]}
+      gl={{ antialias: true, preserveDrawingBuffer: true }}
+    >
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[4, 4, 6]} intensity={1} />
+      <Blob />
+      <Environment preset="city" />
+      <OrbitControls
+        enableZoom={false}
+        enablePan={false}
+        autoRotate
+        autoRotateSpeed={0.6}
+      />
+    </Canvas>
   );
 }
