@@ -1,5 +1,5 @@
 import About from "@/components/About";
-import ContactSOTD from "@/components/Contact";
+import Contacts from "@/components/Contacts";
 import ExperienceSection from "@/components/Experience";
 import ProjectsSection from "@/components/Projects";
 import Skills from "@/components/Skills";
@@ -13,7 +13,7 @@ export default function HomePage() {
       <ExperienceSection />
       <ProjectsSection />
       <Skills />
-      <ContactSOTD />
+      <Contacts />
     </>
   );
 }
