@@ -57,11 +57,16 @@ const PROJECTS: Project[] = [
       "A sleek movie discovery app with dynamic routing, debounced search, genre filters, and persistent watchlists. Optimized for snappy loads and smooth transitions.",
     tech: ["React", "Next.js", "TailwindCSS", "Framer Motion", "TMDB API"],
     cta: { label: "View Live", href: "https://react-movie-store.vercel.app" },
+    // media: {
+    //   type: "video",
+    //   src: "/projects/react-movie-store.mov",
+    //   poster: "/projects/react-movie-store.png",
+    // },
     media: {
-      type: "video",
-      src: "/projects/react-movie-store.mov",
-      poster: "/projects/react-movie-store.png",
-    },
+        type: "image",
+        src: "/projects/react-movie-store.png",
+        alt: "React movie store",
+      },
   },
   {
     title: "Angular E-commerce",
