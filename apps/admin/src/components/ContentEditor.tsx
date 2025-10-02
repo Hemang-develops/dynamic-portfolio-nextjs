@@ -95,6 +95,40 @@ export default function ContentEditor({
     setStatus((current) => (current?.section === section ? null : current));
   };
 
+  const createPayloadForSection = (
+    section: SectionKey,
+    baselineContent: SiteContent,
+    currentContent: SiteContent
+  ) => {
+    const next = structuredClone(baselineContent);
+
+    switch (section) {
+      case "hero":
+        next.hero = structuredClone(currentContent.hero);
+        break;
+      case "about":
+        next.about = structuredClone(currentContent.about);
+        break;
+      case "experience":
+        next.experience = structuredClone(currentContent.experience);
+        break;
+      case "projects":
+        next.projects = structuredClone(currentContent.projects);
+        break;
+      case "skills":
+        next.skills = structuredClone(currentContent.skills);
+        break;
+      case "contact":
+        next.contact = structuredClone(currentContent.contact);
+        break;
+      default:
+        section satisfies never;
+        break;
+    }
+
+    return next;
+  };
+
   const saveSection = async (section: SectionKey) => {
     if (!dirtySections[section]) {
       return;
@@ -104,8 +138,7 @@ export default function ContentEditor({
     setStatus((current) => (current?.section === section ? null : current));
 
     try {
-      const payload: SiteContent = structuredClone(baseline);
-      payload[section] = structuredClone(content[section]);
+      const payload = createPayloadForSection(section, baseline, content);
 
       const res = await fetch("/api/content", {
         method: "PUT",
