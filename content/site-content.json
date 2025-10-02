@@ -1,0 +1,207 @@
+{
+  "hero": {
+    "name": "Hemang Patel",
+    "tagline": "Frontend Engineer · React · Angular · Next.js",
+    "primaryCta": {
+      "label": "View Projects",
+      "href": "#projects"
+    },
+    "secondaryCta": {
+      "label": "Experience",
+      "href": "#experience"
+    },
+    "quickLinks": [
+      {
+        "label": "hemang2719@gmail.com",
+        "href": "mailto:hemang2719@gmail.com",
+        "icon": "mail"
+      },
+      {
+        "label": "+91 9913156912",
+        "href": "tel:+919913156912",
+        "icon": "phone"
+      },
+      {
+        "label": "India",
+        "href": "https://maps.google.com/?q=India",
+        "icon": "location"
+      }
+    ],
+    "profileImage": "/profileImage.png"
+  },
+  "about": {
+    "heading": "About Me",
+    "bio": "I am a passionate Full Stack Developer with 4+ years of experience building scalable web applications using React, Angular, Node.js, and Python/Django. I thrive in crafting seamless user experiences, optimizing performance, and delivering robust solutions.",
+    "highlights": [
+      "Built and deployed 20+ full-scale projects across domains.",
+      "Resolved 50+ critical issues in production with quick turnaround.",
+      "Reduced codebase size by 15% through refactoring & optimization.",
+      "Improved UX satisfaction scores by 10% in enterprise apps."
+    ],
+    "stats": [
+      { "value": "4+", "label": "Years Experience" },
+      { "value": "20+", "label": "Projects Delivered" },
+      { "value": "50+", "label": "Issues Resolved" },
+      { "value": "15%", "label": "Code Reduction" },
+      { "value": "10%", "label": "UX Improvement" }
+    ]
+  },
+  "experience": {
+    "heading": "Experience",
+    "items": [
+      {
+        "role": "Software Engineer",
+        "company": "Searce",
+        "period": "October 2024 – Present",
+        "points": [
+          "Designed and implemented a dynamic Angular form engine supporting 10+ configurable input types",
+          "Refactored duplicated UI logic into reusable components, reducing code duplication by 15%",
+          "Built a role-based attribute mapping system using TypeScript enums and typed objects",
+          "Developed a tab-based filtering interface with 4 to 6 filters per tab",
+          "Integrated Google Cloud Functions with Secret Manager and Pub/Sub for automation"
+        ]
+      },
+      {
+        "role": "Digital Specialist Engineer",
+        "company": "Infosys",
+        "period": "August 2021 - September 2024",
+        "points": [
+          "Developed high-quality front-end code using ReactJS, Angular, HTML, CSS, and TypeScript",
+          "Successfully delivered 20+ stories on time using Agile SDLC methodology",
+          "Provided technical assistance and maintenance support for 50+ defects",
+          "Utilized GitHub projects for effective tracking of 30+ user stories",
+          "Collaborated with Jira to test 15+ new pages/features"
+        ]
+      }
+    ]
+  },
+  "projects": {
+    "heading": "Projects",
+    "subheading": "Selected case studies with depth, motion and polish. Scroll to explore.",
+    "items": [
+      {
+        "featured": true,
+        "title": "Dynamic Portfolio Platform",
+        "tagline": "Self-editable portfolio with 3D hero + admin",
+        "description": "A headless, layout-configurable portfolio system with an admin to publish live changes instantly. Includes 3D hero, templates, role-based content, and real-time previews.",
+        "tech": ["Next.js", "R3F", "Framer Motion", "Tailwind", "PostgreSQL"],
+        "cta": {
+          "label": "View live",
+          "href": "https://dynamic-portfolio-nextjs.vercel.app/"
+        },
+        "media": {
+          "type": "video",
+          "src": "/projects/portfolio-hero-demo.mov",
+          "poster": "/projects/portfolio-hero-poster.png"
+        }
+      },
+      {
+        "title": "iPhone 15 Pro Product Page (Clone)",
+        "tagline": "Apple-style product storytelling with scroll choreography",
+        "description": "A faithful, responsive recreation of Apple’s iPhone 15 pro page with sticky sections, motion-driven reveals, and premium product visuals. Built for smoothness and polish.",
+        "tech": ["React", "TailwindCSS", "Framer Motion / GSAP"],
+        "cta": { "label": "View Live", "href": "https://iphone-clone-inky.vercel.app/" },
+        "media": {
+          "type": "video",
+          "src": "/projects/iphone-clone.mov",
+          "poster": "/projects/iphone-clone.png"
+        }
+      },
+      {
+        "title": "React Movie Store",
+        "tagline": "Streaming-style catalog with search, filters, and watchlists",
+        "description": "A sleek movie discovery app with dynamic routing, debounced search, genre filters, and persistent watchlists. Optimized for snappy loads and smooth transitions.",
+        "tech": ["React", "Next.js", "TailwindCSS", "Framer Motion", "TMDB API"],
+        "cta": { "label": "View Live", "href": "https://react-movie-store.vercel.app" },
+        "media": {
+          "type": "video",
+          "src": "/projects/react-movie-store.mov",
+          "poster": "/projects/react-movie-store.png"
+        }
+      },
+      {
+        "title": "Angular E-commerce",
+        "tagline": "Full-featured shop: cart, checkout, product filters",
+        "description": "An Angular storefront with category filters, product detail pages, cart management, and responsive UI. Built with best practices for state, routing, and performance.",
+        "tech": ["Angular", "TypeScript", "RxJS", "SCSS"],
+        "cta": {
+          "label": "View Live",
+          "href": "https://angular-ecommerce-website.vercel.app"
+        },
+        "media": {
+          "type": "image",
+          "src": "/projects/angular-ecommerce.png",
+          "alt": "Angular E-commerce UI"
+        }
+      }
+    ]
+  },
+  "skills": {
+    "heading": "Skills",
+    "rows": [
+      {
+        "label": "Frontend",
+        "skills": ["React", "Next.js", "Angular", "TypeScript", "TailwindCSS", "RxJS"],
+        "speed": 50
+      },
+      {
+        "label": "Backend",
+        "skills": ["Node.js", "Express", "Python", "Django"],
+        "speed": 50,
+        "reverse": true
+      },
+      {
+        "label": "Cloud & DevOps",
+        "skills": ["GCP", "Cloud Functions", "Pub/Sub", "Secret Manager"],
+        "speed": 50
+      },
+      {
+        "label": "Tooling",
+        "skills": ["Git / GitHub", "Jira"],
+        "speed": 50,
+        "reverse": true
+      }
+    ]
+  },
+  "contact": {
+    "heading": "Let’s build something great",
+    "subheading": "Have an opportunity, idea, or problem to solve? Send a note—I will reply within 24 hours.",
+    "cards": [
+      {
+        "title": "Email",
+        "value": "hemang2719@gmail.com",
+        "href": "mailto:hemang2719@gmail.com"
+      },
+      {
+        "title": "Location",
+        "value": "India (IST)",
+        "href": "https://maps.apple.com/?q=India",
+        "external": true
+      },
+      {
+        "title": "LinkedIn",
+        "value": "@hemang-patel",
+        "href": "https://www.linkedin.com/in/hemang-patel-8a57311a5/",
+        "external": true
+      },
+      {
+        "title": "GitHub",
+        "value": "@hemang-develops",
+        "href": "https://github.com/Hemang-develops/",
+        "external": true
+      }
+    ],
+    "policyNote": "By sending, you agree to be contacted back. No spam.",
+    "submitLabel": "Send message",
+    "sendingLabel": "Sending…",
+    "successLabel": "Sent",
+    "errorLabel": "Try again",
+    "successMessage": "Thanks! I’ll get back to you shortly.",
+    "footnotes": [
+      { "label": "Response", "value": "~24h" },
+      { "label": "Timezone", "value": "IST (+05:30)" },
+      { "label": "Status", "value": "Open to work" },
+      { "label": "Freelance", "value": "Available" }
+    ]
+  }
+}

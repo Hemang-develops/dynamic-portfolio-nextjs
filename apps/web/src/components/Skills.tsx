@@ -9,22 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-
-type Type = "Frontend" | "Backend" | "Cloud & DevOps" | "Tooling";
-
-const SKILLS_BY_TYPE: Record<Type, string[]> = {
-  Frontend: [
-    "React",
-    "Next.js",
-    "Angular",
-    "TypeScript",
-    "TailwindCSS",
-    "RxJS",
-  ],
-  Backend: ["Node.js", "Express", "Python", "Django"],
-  "Cloud & DevOps": ["GCP", "Cloud Functions", "Pub/Sub", "Secret Manager"],
-  Tooling: ["Git / GitHub", "Jira"],
-};
+import type { SkillRow, SkillsContent } from "@portfolio-content/schema";
 
 /** Ensure the list is long enough to cover width comfortably */
 function buildDense(skills: string[], minCount = 10) {
@@ -39,12 +24,7 @@ function MarqueeRowFM({
   skills,
   reverse = false,
   speed = 60, // seconds to traverse one full track width
-}: {
-  label: string;
-  skills: string[];
-  reverse?: boolean;
-  speed?: number;
-}) {
+}: SkillRow) {
   const prefersReduced = useReducedMotion();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const trackARef = useRef<HTMLDivElement | null>(null);
@@ -164,7 +144,7 @@ function MarqueeRowFM({
   );
 }
 
-export default function Skills() {
+export default function Skills({ data }: { data: SkillsContent }) {
   return (
     <section
       id="skills"
@@ -172,32 +152,19 @@ export default function Skills() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <h2 className="text-4xl md:text-6xl font-extrabold text-center mb-12">
-          Skills
+          {data.heading}
         </h2>
 
         <div className="space-y-10">
-          <MarqueeRowFM
-            label="Frontend"
-            skills={SKILLS_BY_TYPE["Frontend"]}
-            speed={50}
-          />
-          <MarqueeRowFM
-            label="Backend"
-            skills={SKILLS_BY_TYPE["Backend"]}
-            speed={50}
-            reverse
-          />
-          <MarqueeRowFM
-            label="Cloud & DevOps"
-            skills={SKILLS_BY_TYPE["Cloud & DevOps"]}
-            speed={50}
-          />
-          <MarqueeRowFM
-            label="Tooling"
-            skills={SKILLS_BY_TYPE["Tooling"]}
-            speed={50}
-            reverse
-          />
+          {data.rows.map((row) => (
+            <MarqueeRowFM
+              key={row.label}
+              label={row.label}
+              skills={row.skills}
+              reverse={row.reverse}
+              speed={row.speed}
+            />
+          ))}
         </div>
       </div>
 

@@ -3,10 +3,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Cross } from "lucide-react";
 import { useRef, useState } from "react";
+import type { ContactCard as ContactCardType, ContactContent } from "@portfolio-content/schema";
 
 type State = "idle" | "loading" | "success" | "error";
 
-export default function Contacts() {
+export default function Contacts({ data }: { data: ContactContent }) {
   const [state, setState] = useState<State>("idle");
   const [err, setErr] = useState<string | null>(null);
 
@@ -82,39 +83,18 @@ export default function Contacts() {
           transition={{ duration: 0.6 }}
           className="text-4xl md:text-6xl font-extrabold text-center mb-4"
         >
-          Let’s build something great
+          {data.heading}
         </motion.h2>
         <p className="text-center text-gray-300 max-w-2xl mx-auto mb-14">
-          Have an opportunity, idea, or problem to solve? Send a note—I will
-          reply within 24 hours.
+          {data.subheading}
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {/* left: contact cards */}
           <div className="space-y-6">
-            <ContactCard
-              title="Email"
-              value="hemang2719@gmail.com"
-              href="mailto:hemang2719@gmail.com"
-            />
-            <ContactCard
-              title="Location"
-              value="India (IST)"
-              href="https://maps.apple.com/?q=India"
-              external
-            />
-            <ContactCard
-              title="LinkedIn"
-              value="@hemang-patel"
-              href="https://www.linkedin.com/in/hemang-patel-8a57311a5/"
-              external
-            />
-            <ContactCard
-              title="GitHub"
-              value="@hemang-develops"
-              href="https://github.com/Hemang-develops/"
-              external
-            />
+            {data.cards.map((card) => (
+              <ContactCard key={card.title} card={card} />
+            ))}
           </div>
 
           {/* right: form */}
@@ -160,7 +140,7 @@ export default function Contacts() {
 
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-xs text-gray-400">
-                      By sending, you agree to be contacted back. No spam.
+                      {data.policyNote}
                     </p>
                     <motion.button
                       type="submit"
@@ -176,20 +156,20 @@ export default function Contacts() {
                       {state === "loading" ? (
                         <>
                           <Spinner />
-                          Sending…
+                          {data.sendingLabel}
                         </>
                       ) : state === "success" ? (
                         <>
                           <Check />
-                          Sent
+                          {data.successLabel}
                         </>
                       ) : state === "error" ? (
                         <>
                           <Cross />
-                          Try again
+                          {data.errorLabel}
                         </>
                       ) : (
-                        "Send message"
+                        data.submitLabel
                       )}
                     </motion.button>
                   </div>
@@ -212,7 +192,7 @@ export default function Contacts() {
                         exit={{ opacity: 0, y: -8 }}
                         className="text-sm text-emerald-300"
                       >
-                        Thanks! I’ll get back to you shortly.
+                        {data.successMessage}
                       </motion.p>
                     )}
                   </AnimatePresence>
@@ -224,18 +204,14 @@ export default function Contacts() {
 
         {/* footer badges */}
         <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-gray-400 text-xs">
-          <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md py-3">
-            Response <span className="text-white/90">~24h</span>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md py-3">
-            Timezone <span className="text-white/90">IST (+05:30)</span>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md py-3">
-            Status <span className="text-emerald-300">Open to work</span>
-          </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md py-3">
-            Freelance <span className="text-white/90">Available</span>
-          </div>
+          {data.footnotes.map((item) => (
+            <div
+              key={item.label}
+              className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-md py-3"
+            >
+              {item.label} <span className="text-white/90">{item.value}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -244,30 +220,20 @@ export default function Contacts() {
 
 /* ---------- subcomponents ---------- */
 
-function ContactCard({
-  title,
-  value,
-  href,
-  external,
-}: {
-  title: string;
-  value: string;
-  href: string;
-  external?: boolean;
-}) {
+function ContactCard({ card }: { card: ContactCardType }) {
   return (
     <a
-      href={href}
-      target={external ? "_blank" : undefined}
-      rel={external ? "noreferrer" : undefined}
+      href={card.href}
+      target={card.external ? "_blank" : undefined}
+      rel={card.external ? "noreferrer" : undefined}
       className="group relative block rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur-lg shadow-2xl overflow-hidden"
     >
       <div className="pointer-events-none absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-600/10 opacity-0 group-hover:opacity-100 blur-2xl transition" />
       <div className="relative">
         <div className="text-xs uppercase tracking-widest text-gray-400">
-          {title}
+          {card.title}
         </div>
-        <div className="mt-1 text-lg font-medium">{value}</div>
+        <div className="mt-1 text-lg font-medium">{card.value}</div>
       </div>
     </a>
   );
