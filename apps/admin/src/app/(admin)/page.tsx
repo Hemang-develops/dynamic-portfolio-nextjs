@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { ADMIN_NAV_ITEMS } from "@/config/navigation";
-import { readSiteContent } from "@portfolio-content/utils";
+import { fetchSiteContent } from "@/lib/content-api";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const content = await readSiteContent();
+  const content = await fetchSiteContent();
 
   const totalProjects = content.projects.items.length;
   const totalExperiences = content.experience.items.length;

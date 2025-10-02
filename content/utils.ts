@@ -25,6 +25,7 @@ export async function readSiteContent(): Promise<SiteContent> {
 
 export async function writeSiteContent(data: SiteContent): Promise<void> {
   const validated = validateSiteContent(data);
+  await fs.mkdir(path.dirname(DATA_PATH), { recursive: true });
   await fs.writeFile(DATA_PATH, JSON.stringify(validated, null, 2) + "\n", "utf-8");
 }
 
