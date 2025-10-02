@@ -62,6 +62,7 @@ export type ProjectMedia =
   | {
       type: "video";
       src: string;
+      alt?: string;
       poster?: string;
     };
 
