@@ -22,6 +22,14 @@ const labelClass = "text-xs font-semibold uppercase tracking-wide text-slate-400
 
 const heroIconOptions: HeroIcon[] = [...HERO_ICON_OPTIONS];
 
+const CONTENT_ENDPOINT = (() => {
+  const base = process.env.NEXT_PUBLIC_CONTENT_API_URL?.trim();
+  if (base) {
+    return `${base.replace(/\/$/, "")}/content`;
+  }
+  return "/api/content";
+})();
+
 const SECTION_KEYS = ["hero", "about", "experience", "projects", "skills", "contact"] as const;
 type SectionKey = (typeof SECTION_KEYS)[number];
 
@@ -140,7 +148,7 @@ export default function ContentEditor({
     try {
       const payload = createPayloadForSection(section, baseline, content);
 
-      const res = await fetch("/api/content", {
+      const res = await fetch(CONTENT_ENDPOINT, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

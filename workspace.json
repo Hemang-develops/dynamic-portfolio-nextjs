@@ -12,6 +12,11 @@
       "command": "npm run dev:admin",
       "url": "http://localhost:3001",
       "show": true
+    },
+    "content-api": {
+      "command": "npm run dev:api",
+      "url": "http://localhost:4000/healthz",
+      "show": true
     }
   }
 }

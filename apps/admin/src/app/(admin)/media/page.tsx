@@ -1,10 +1,10 @@
 import MediaLibrary from "@/components/MediaLibrary";
-import { readSiteContent } from "@portfolio-content/utils";
+import { fetchSiteContent } from "@/lib/content-api";
 
 export const dynamic = "force-dynamic";
 
 export default async function MediaPage() {
-  const content = await readSiteContent();
+  const content = await fetchSiteContent();
 
   const referencedAssets = new Set<string>();
   for (const project of content.projects.items) {

@@ -1,6 +1,6 @@
 # Portfolio Admin Workspace
 
-This Next.js app provides a lightweight control panel for editing the portfolio content without touching the public-site code. It reads and writes the shared [`content/site-content.json`](../../content/site-content.json) file that both the admin and marketing site consume.
+This Next.js app provides a lightweight control panel for editing the portfolio content without touching the public-site code. It communicates with the shared content API (see [`apps/content-api`](../content-api)) which persists updates to [`content/site-content.json`](../../content/site-content.json) for both the admin and marketing site to consume.
 
 ## Running locally
 
@@ -8,7 +8,7 @@ This Next.js app provides a lightweight control panel for editing the portfolio 
 npm run dev
 ```
 
-The admin UI runs on [http://localhost:3001](http://localhost:3001) when started from the repository root (`npm run dev` starts both the web and admin workspaces).
+The admin UI runs on [http://localhost:3001](http://localhost:3001) when started from the repository root (`npm run dev` starts the API, web, and admin workspaces).
 
 ## Features
 
@@ -22,6 +22,6 @@ The admin UI runs on [http://localhost:3001](http://localhost:3001) when started
 
 ## API
 
-`PUT /api/content` validates and writes new content to disk, while `GET /api/content` exposes the current JSON snapshot for tooling.
+`PUT /api/content` proxies to the backend service and writes new content after validation, while `GET /api/content` exposes the current JSON snapshot for tooling through the same service.
 
-> **Note:** The admin writes directly to the JSON file in the repo. When deploying to serverless hosting, point `writeSiteContent` to a persistent datastore (e.g., PostgreSQL, Supabase, or a KV store) instead of the file system.
+> **Note:** The backend persists to the JSON file in the repo. When deploying to serverless hosting, replace the implementation in `apps/content-api` with a persistent datastore (e.g., PostgreSQL, Supabase, or a KV store) instead of the file system.

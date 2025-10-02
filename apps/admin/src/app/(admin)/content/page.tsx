@@ -1,10 +1,10 @@
 import ContentEditor from "@/components/ContentEditor";
-import { readSiteContent } from "@portfolio-content/utils";
+import { fetchSiteContent } from "@/lib/content-api";
 
 export const dynamic = "force-dynamic";
 
 export default async function ContentPage() {
-  const content = await readSiteContent();
+  const content = await fetchSiteContent();
 
   return (
     <div className="space-y-8">

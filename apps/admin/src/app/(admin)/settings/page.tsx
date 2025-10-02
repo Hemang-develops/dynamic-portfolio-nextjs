@@ -1,10 +1,10 @@
 import SitePreferencesForm from "@/components/SitePreferencesForm";
-import { readSiteContent } from "@portfolio-content/utils";
+import { fetchSiteContent } from "@/lib/content-api";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const content = await readSiteContent();
+  const content = await fetchSiteContent();
 
   const primaryEmail = content.contact.cards.find((card) => card.title.toLowerCase() === "email")?.value ?? "";
 
