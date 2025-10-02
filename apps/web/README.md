@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dynamic Portfolio Web App
 
-## Getting Started
+This is the public-facing Next.js site for the dynamic portfolio. All section content is sourced from [`content/site-content.json`](../../content/site-content.json) so that the admin workspace can update copy and case studies without touching code.
 
-First, run the development server:
+## Running locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The site runs on [http://localhost:3000](http://localhost:3000). Use `npm run dev` from the repository root to launch both the public site and the admin editor simultaneously.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Contact form configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The `/api/contact` route sends submissions through [Resend](https://resend.com/). Configure the following environment variables for production deployments:
 
-## Learn More
+- `RESEND_API_KEY` – API key with access to send emails.
+- `RESEND_FROM_EMAIL` – Verified sender (e.g., `Portfolio <hello@yourdomain.com>`).
+- `CONTACT_TO_EMAIL` – Destination inbox for submissions (falls back to `RESEND_TO_EMAIL`).
 
-To learn more about Next.js, take a look at the following resources:
+Without these variables the API responds with an error and the UI will prompt you to configure the backend.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Content model
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The site expects the JSON content to match the schema defined in [`content/schema.ts`](../../content/schema.ts). Validation runs inside the admin API before persisting changes.

@@ -2,112 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import type { ProjectItem, ProjectsContent } from "@portfolio-content/schema";
 
-type Project = {
-  title: string;
-  tagline: string;
-  description: string;
-  tech: string[];
-  cta?: { label: string; href: string };
-  media: {
-    type: "image" | "video";
-    src: string;
-    poster?: string; // for video
-    alt?: string; // for image
-  };
-  featured?: boolean; // bigger block
-};
-
-const PROJECTS: Project[] = [
-  {
-    featured: true,
-    title: "Dynamic Portfolio Platform",
-    tagline: "Self-editable portfolio with 3D hero + admin",
-    description:
-      "A headless, layout-configurable portfolio system with an admin to publish live changes instantly. Includes 3D hero, templates, role-based content, and real-time previews.",
-    tech: ["Next.js", "R3F", "Framer Motion", "Tailwind", "PostgreSQL"],
-    cta: {
-      label: "View live",
-      href: "https://dynamic-portfolio-nextjs.vercel.app/",
-    },
-    media: {
-      type: "video",
-      src: "/projects/portfolio-hero-demo.mov",
-      poster: "/projects/portfolio-hero-poster.png",
-    },
-  },
-  {
-    // featured: true,
-    title: "iPhone 15 Pro Product Page (Clone)",
-    tagline: "Apple-style product storytelling with scroll choreography",
-    description:
-      "A faithful, responsive recreation of Apple’s iPhone 15 pro page with sticky sections, motion-driven reveals, and premium product visuals. Built for smoothness and polish.",
-    tech: ["React", "TailwindCSS", "Framer Motion / GSAP"],
-    cta: { label: "View Live", href: "https://iphone-clone-inky.vercel.app/" },
-    media: {
-      type: "video",
-      src: "/projects/iphone-clone.mov",
-      poster: "/projects/iphone-clone.png",
-    },
-  },
-  {
-    title: "React Movie Store",
-    tagline: "Streaming-style catalog with search, filters, and watchlists",
-    description:
-      "A sleek movie discovery app with dynamic routing, debounced search, genre filters, and persistent watchlists. Optimized for snappy loads and smooth transitions.",
-    tech: ["React", "Next.js", "TailwindCSS", "Framer Motion", "TMDB API"],
-    cta: { label: "View Live", href: "https://react-movie-store.vercel.app" },
-    media: {
-      type: "video",
-      src: "/projects/react-movie-store.mov",
-      poster: "/projects/react-movie-store.png",
-    },
-  },
-  {
-    title: "Angular E-commerce",
-    tagline: "Full-featured shop: cart, checkout, product filters",
-    description:
-      "An Angular storefront with category filters, product detail pages, cart management, and responsive UI. Built with best practices for state, routing, and performance.",
-    tech: ["Angular", "TypeScript", "RxJS", "SCSS"],
-    cta: {
-      label: "View Live",
-      href: "https://angular-ecommerce-website.vercel.app",
-    },
-    media: {
-      type: "image",
-      src: "/projects/angular-ecommerce.png",
-      alt: "Angular E-commerce UI",
-    },
-  },
-  //   {
-  //     title: "Job Role Form Engine",
-  //     tagline: "Configurable form engine for enterprise workflows",
-  //     description:
-  //       "Angular-based dynamic form engine supporting 10+ input families, enum-driven rules, and role-wise attribute mapping with pristine UX and accessibility.",
-  //     tech: ["Angular", "TypeScript", "RxJS", "SCSS"],
-  //     cta: { label: "See Details", href: "#" },
-  //     media: {
-  //       type: "image",
-  //       src: "/projects/form-engine-shot.png",
-  //       alt: "Form Engine UI",
-  //     },
-  //   },
-  //   {
-  //     title: "GCP Secret Automation",
-  //     tagline: "Secure secrets + notifications via Cloud Functions",
-  //     description:
-  //       "Automated secret creation/validation flows using Secret Manager, Pub/Sub, and Functions. Sends email/chat on valid/invalid access with audit logging.",
-  //     tech: ["GCP", "Cloud Functions", "Secret Manager", "Pub/Sub", "Node.js"],
-  //     cta: { label: "Read More", href: "#" },
-  //     media: {
-  //       type: "image",
-  //       src: "/projects/gcp-automation.png",
-  //       alt: "GCP Automation Diagram",
-  //     },
-  //   },
-];
-
-function CaseStudy({ project, index }: { project: Project; index: number }) {
+function CaseStudy({ project, index }: { project: ProjectItem; index: number }) {
   const isEven = index % 2 === 0;
   const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -178,8 +75,9 @@ function CaseStudy({ project, index }: { project: Project; index: number }) {
           {/* Poster image (visible when not playing) */}
           <img
             src={
-              project.media.poster ??
-              (project.media.type === "image" ? project.media.src : "")
+              project.media.type === "video"
+                ? project.media.poster ?? ""
+                : project.media.src
             }
             alt={project.media.alt ?? project.title}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${
@@ -286,7 +184,11 @@ function CaseStudy({ project, index }: { project: Project; index: number }) {
   );
 }
 
-export default function ProjectsSection() {
+export default function ProjectsSection({
+  data,
+}: {
+  data: ProjectsContent;
+}) {
   return (
     <section
       id="projects"
@@ -300,16 +202,15 @@ export default function ProjectsSection() {
           transition={{ duration: 0.6 }}
           className="text-4xl md:text-6xl font-extrabold text-center mb-6"
         >
-          Projects
+          {data.heading}
         </motion.h2>
         <p className="text-center text-gray-300 max-w-2xl mx-auto mb-12 md:mb-16">
-          Selected case studies with depth, motion and polish. Scroll to
-          explore.
+          {data.subheading}
         </p>
 
         {/* Case studies */}
         <div className="space-y-8 md:space-y-16">
-          {PROJECTS.map((p, i) => (
+          {data.items.map((p, i) => (
             <CaseStudy key={p.title} project={p} index={i} />
           ))}
         </div>
