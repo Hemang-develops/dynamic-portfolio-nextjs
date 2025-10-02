@@ -22,37 +22,95 @@ const labelClass = "text-xs font-semibold uppercase tracking-wide text-slate-400
 
 const heroIconOptions: HeroIcon[] = [...HERO_ICON_OPTIONS];
 
+const SECTION_KEYS = ["hero", "about", "experience", "projects", "skills", "contact"] as const;
+type SectionKey = (typeof SECTION_KEYS)[number];
+
+const SECTION_META: Record<SectionKey, { title: string; description: string }> = {
+  hero: {
+    title: "Hero",
+    description: "Control the hero headline, call-to-actions, and quick contact links.",
+  },
+  about: {
+    title: "About",
+    description: "Update the biography and highlight statistics powering the about section.",
+  },
+  experience: {
+    title: "Experience",
+    description: "Maintain the experience timeline items, including bullet highlights.",
+  },
+  projects: {
+    title: "Projects",
+    description: "Manage the featured case studies, tech stacks, media, and CTAs.",
+  },
+  skills: {
+    title: "Skills",
+    description: "Curate the marquee of highlighted skill rows and animation timings.",
+  },
+  contact: {
+    title: "Contact",
+    description: "Tune the contact form copy, contact cards, and footer badges.",
+  },
+};
+
+const createDirtyState = () =>
+  SECTION_KEYS.reduce(
+    (acc, key) => {
+      acc[key] = false;
+      return acc;
+    },
+    {} as Record<SectionKey, boolean>
+  );
+
 export default function ContentEditor({
   initialContent,
 }: {
   initialContent: SiteContent;
 }) {
-  const [content, setContent] = useState<SiteContent>(initialContent);
-  const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState<null | { type: "success" | "error"; message: string }>(
-    null
-  );
-  const [dirty, setDirty] = useState(false);
+  const [content, setContent] = useState<SiteContent>(() => structuredClone(initialContent));
+  const [baseline, setBaseline] = useState<SiteContent>(() => structuredClone(initialContent));
+  const [dirtySections, setDirtySections] = useState<Record<SectionKey, boolean>>(createDirtyState);
+  const [activeSection, setActiveSection] = useState<SectionKey>("hero");
+  const [savingSection, setSavingSection] = useState<SectionKey | null>(null);
+  const [status, setStatus] = useState<
+    null | { section: SectionKey; type: "success" | "error"; message: string }
+  >(null);
 
-  const updateContent = (updater: (prev: SiteContent) => SiteContent) => {
+  const updateSection = (
+    section: SectionKey,
+    updater: (prev: SiteContent) => SiteContent
+  ) => {
     setContent((prev) => updater(prev));
-    setDirty(true);
+    setDirtySections((prev) => ({ ...prev, [section]: true }));
+    setStatus((current) => (current?.section === section ? null : current));
   };
 
-  const resetChanges = () => {
-    setContent(initialContent);
-    setDirty(false);
-    setStatus(null);
+  const resetSection = (section: SectionKey) => {
+    setContent((prev) =>
+      ({
+        ...prev,
+        [section]: structuredClone(baseline[section]),
+      } as SiteContent)
+    );
+    setDirtySections((prev) => ({ ...prev, [section]: false }));
+    setStatus((current) => (current?.section === section ? null : current));
   };
 
-  const saveChanges = async () => {
-    setSaving(true);
-    setStatus(null);
+  const saveSection = async (section: SectionKey) => {
+    if (!dirtySections[section]) {
+      return;
+    }
+
+    setSavingSection(section);
+    setStatus((current) => (current?.section === section ? null : current));
+
     try {
+      const payload: SiteContent = structuredClone(baseline);
+      payload[section] = structuredClone(content[section]);
+
       const res = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(content),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -60,13 +118,23 @@ export default function ContentEditor({
         throw new Error(data.error || "Unable to save content");
       }
 
-      setStatus({ type: "success", message: "Content saved successfully." });
-      setDirty(false);
+      setBaseline((prev) =>
+        ({
+          ...prev,
+          [section]: structuredClone(content[section]),
+        } as SiteContent)
+      );
+      setDirtySections((prev) => ({ ...prev, [section]: false }));
+      setStatus({
+        section,
+        type: "success",
+        message: `${SECTION_META[section].title} saved successfully.`,
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Something went wrong.";
-      setStatus({ type: "error", message });
+      setStatus({ section, type: "error", message });
     } finally {
-      setSaving(false);
+      setSavingSection(null);
     }
   };
 
@@ -76,65 +144,149 @@ export default function ContentEditor({
   const projects = content.projects;
   const skills = content.skills;
   const contact = content.contact;
+  const activeMeta = SECTION_META[activeSection];
+  const sectionDirty = dirtySections[activeSection];
+  const sectionSaving = savingSection === activeSection;
+  const activeStatus = status && status.section === activeSection ? status : null;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-10 px-6 py-12">
-      <header className="flex flex-col gap-4 border-b border-slate-800 pb-8 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Portfolio Content Admin</h1>
-          <p className="text-sm text-slate-400">
-            Update copy, projects, and contact details. Changes persist to the shared JSON
-            content file that powers the public site.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={resetChanges}
-            disabled={!dirty || saving}
-            className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Reset
-          </button>
-          <button
-            type="button"
-            onClick={saveChanges}
-            disabled={saving || !dirty}
-            className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {saving ? "Saving…" : dirty ? "Save changes" : "Saved"}
-          </button>
-        </div>
-      </header>
+    <div className="mx-auto max-w-6xl px-6 py-8">
+      <div className="grid gap-8 lg:grid-cols-[240px,1fr]">
+        <aside className="space-y-4 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-5">
+          <div className="space-y-1">
+            <h2 className="text-sm font-semibold text-white">Content sections</h2>
+            <p className="text-xs text-slate-400">
+              Navigate between sections to edit and save updates independently.
+            </p>
+          </div>
+          <nav className="flex flex-col gap-1">
+            {SECTION_KEYS.map((key) => {
+              const meta = SECTION_META[key];
+              const isActive = key === activeSection;
+              const isDirty = dirtySections[key];
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setActiveSection(key)}
+                  className={`rounded-xl border px-4 py-3 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 ${
+                    isActive
+                      ? "border-blue-500/40 bg-blue-500/10 text-white shadow-inner shadow-blue-500/10"
+                      : "border-transparent text-slate-300 hover:border-slate-700/60 hover:bg-slate-900/70 hover:text-white"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium">{meta.title}</span>
+                    {isDirty && <span className="text-xs font-semibold text-amber-300">●</span>}
+                  </div>
+                  <p className="mt-1 text-xs text-slate-400">{meta.description}</p>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
 
-      {status && (
-        <div
-          className={`rounded-lg border px-4 py-3 text-sm ${
-            status.type === "success"
-              ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
-              : "border-rose-500/40 bg-rose-500/10 text-rose-200"
-          }`}
-        >
-          {status.message}
-        </div>
-      )}
+        <div className="space-y-6">
+          <header className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-2">
+                <h1 className="text-2xl font-semibold text-white">Portfolio Content Admin</h1>
+                <p className="text-sm text-slate-400">
+                  Update copy, projects, and contact details. Changes persist to the shared JSON
+                  content file that powers the public site.
+                </p>
+              </div>
+              <div className="space-y-1 rounded-xl border border-slate-800/70 bg-slate-950/70 p-4 text-sm">
+                <p className="text-xs uppercase tracking-wide text-slate-500">Active section</p>
+                <p className="text-base font-semibold text-white">{activeMeta.title}</p>
+                <p className="text-xs text-slate-400">{activeMeta.description}</p>
+              </div>
+            </div>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p
+                className={`text-sm ${
+                  sectionDirty ? "text-amber-200" : "text-slate-400"
+                }`}
+              >
+                {sectionDirty
+                  ? "You have unsaved edits in this section."
+                  : "All changes for this section are saved."}
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => resetSection(activeSection)}
+                  disabled={!sectionDirty || sectionSaving}
+                  className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Reset section
+                </button>
+                <button
+                  type="button"
+                  onClick={() => saveSection(activeSection)}
+                  disabled={!sectionDirty || sectionSaving}
+                  className="rounded-lg bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {sectionSaving ? "Saving…" : sectionDirty ? "Save section" : "Saved"}
+                </button>
+              </div>
+            </div>
+          </header>
 
-      {/* Hero */}
-      <section className={sectionCardClass}>
-        <div className="border-b border-slate-800 px-6 py-5">
-          <h2 className="text-lg font-semibold text-white">Hero</h2>
-          <p className="text-xs text-slate-400">
-            Control the hero headline, call-to-actions, and quick contact links.
-          </p>
-        </div>
-        <div className="space-y-6 px-6 py-6">
+          <nav className="rounded-2xl border border-slate-800/60 bg-slate-900/50 p-3">
+            <div className="flex flex-wrap items-center gap-2">
+              {SECTION_KEYS.map((key) => {
+                const meta = SECTION_META[key];
+                const isActive = key === activeSection;
+                const isDirty = dirtySections[key];
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setActiveSection(key)}
+                    className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/60 ${
+                      isActive
+                        ? "border-blue-500/40 bg-blue-500/15 text-white shadow-inner shadow-blue-500/10"
+                        : "border-transparent bg-slate-950/30 text-slate-300 hover:border-slate-700/60 hover:text-white"
+                    }`}
+                  >
+                    <span>{meta.title}</span>
+                    {isDirty && <span className="text-xs font-semibold text-amber-300">●</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+
+          {activeStatus && (
+            <div
+              className={`rounded-lg border px-4 py-3 text-sm ${
+                activeStatus.type === "success"
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+                  : "border-rose-500/40 bg-rose-500/10 text-rose-200"
+              }`}
+            >
+              {activeStatus.message}
+            </div>
+          )}
+
+          {/* Hero */}
+          {activeSection === "hero" && (
+            <section className={sectionCardClass}>
+              <div className="border-b border-slate-800 px-6 py-5">
+                <h2 className="text-lg font-semibold text-white">Hero</h2>
+                <p className="text-xs text-slate-400">
+                  Control the hero headline, call-to-actions, and quick contact links.
+                </p>
+              </div>
+              <div className="space-y-6 px-6 py-6">
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="Name">
               <input
                 className={inputClass}
                 value={hero.name}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("hero", (prev) => ({
                     ...prev,
                     hero: { ...prev.hero, name: e.target.value },
                   }))
@@ -146,7 +298,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={hero.tagline}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("hero", (prev) => ({
                     ...prev,
                     hero: { ...prev.hero, tagline: e.target.value },
                   }))
@@ -161,7 +313,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={hero.primaryCta.label}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("hero", (prev) => ({
                     ...prev,
                     hero: {
                       ...prev.hero,
@@ -176,7 +328,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={hero.primaryCta.href}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("hero", (prev) => ({
                     ...prev,
                     hero: {
                       ...prev.hero,
@@ -194,7 +346,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={hero.secondaryCta.label}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("hero", (prev) => ({
                     ...prev,
                     hero: {
                       ...prev.hero,
@@ -209,7 +361,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={hero.secondaryCta.href}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("hero", (prev) => ({
                     ...prev,
                     hero: {
                       ...prev.hero,
@@ -226,7 +378,7 @@ export default function ContentEditor({
               className={inputClass}
               value={hero.profileImage}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("hero", (prev) => ({
                   ...prev,
                   hero: { ...prev.hero, profileImage: e.target.value },
                 }))
@@ -240,7 +392,7 @@ export default function ContentEditor({
               <button
                 type="button"
                 onClick={() =>
-                  updateContent((prev) => ({
+                  updateSection("hero", (prev) => ({
                     ...prev,
                     hero: {
                       ...prev.hero,
@@ -272,7 +424,7 @@ export default function ContentEditor({
                       className={inputClass}
                       value={link.label}
                       onChange={(e) =>
-                        updateContent((prev) => ({
+                        updateSection("hero", (prev) => ({
                           ...prev,
                           hero: {
                             ...prev.hero,
@@ -289,7 +441,7 @@ export default function ContentEditor({
                       className={inputClass}
                       value={link.href}
                       onChange={(e) =>
-                        updateContent((prev) => ({
+                        updateSection("hero", (prev) => ({
                           ...prev,
                           hero: {
                             ...prev.hero,
@@ -306,7 +458,7 @@ export default function ContentEditor({
                       className={`${inputClass} pr-8`}
                       value={link.icon}
                       onChange={(e) =>
-                        updateContent((prev) => ({
+                        updateSection("hero", (prev) => ({
                           ...prev,
                           hero: {
                             ...prev.hero,
@@ -327,7 +479,7 @@ export default function ContentEditor({
                   <button
                     type="button"
                     onClick={() =>
-                      updateContent((prev) => ({
+                      updateSection("hero", (prev) => ({
                         ...prev,
                         hero: {
                           ...prev.hero,
@@ -343,24 +495,26 @@ export default function ContentEditor({
               ))}
             </div>
           </div>
-        </div>
-      </section>
+              </div>
+            </section>
+          )}
 
-      {/* About */}
-      <section className={sectionCardClass}>
-        <div className="border-b border-slate-800 px-6 py-5">
-          <h2 className="text-lg font-semibold text-white">About</h2>
-          <p className="text-xs text-slate-400">
-            Update the biography and highlight statistics powering the about section.
-          </p>
-        </div>
-        <div className="space-y-6 px-6 py-6">
+          {/* About */}
+          {activeSection === "about" && (
+            <section className={sectionCardClass}>
+              <div className="border-b border-slate-800 px-6 py-5">
+                <h2 className="text-lg font-semibold text-white">About</h2>
+                <p className="text-xs text-slate-400">
+                  Update the biography and highlight statistics powering the about section.
+                </p>
+              </div>
+              <div className="space-y-6 px-6 py-6">
           <Field label="Section heading">
             <input
               className={inputClass}
               value={about.heading}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("about", (prev) => ({
                   ...prev,
                   about: { ...prev.about, heading: e.target.value },
                 }))
@@ -374,7 +528,7 @@ export default function ContentEditor({
               value={about.bio}
               rows={4}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("about", (prev) => ({
                   ...prev,
                   about: { ...prev.about, bio: e.target.value },
                 }))
@@ -392,7 +546,7 @@ export default function ContentEditor({
                   .split("\n")
                   .map((item) => item.trim())
                   .filter(Boolean);
-                updateContent((prev) => ({
+                updateSection("about", (prev) => ({
                   ...prev,
                   about: { ...prev.about, highlights: items },
                 }));
@@ -406,7 +560,7 @@ export default function ContentEditor({
               <button
                 type="button"
                 onClick={() =>
-                  updateContent((prev) => ({
+                  updateSection("about", (prev) => ({
                     ...prev,
                     about: {
                       ...prev.about,
@@ -431,7 +585,7 @@ export default function ContentEditor({
                       className={inputClass}
                       value={stat.value}
                       onChange={(e) =>
-                        updateContent((prev) => ({
+                        updateSection("about", (prev) => ({
                           ...prev,
                           about: {
                             ...prev.about,
@@ -448,7 +602,7 @@ export default function ContentEditor({
                       className={inputClass}
                       value={stat.label}
                       onChange={(e) =>
-                        updateContent((prev) => ({
+                        updateSection("about", (prev) => ({
                           ...prev,
                           about: {
                             ...prev.about,
@@ -463,7 +617,7 @@ export default function ContentEditor({
                   <button
                     type="button"
                     onClick={() =>
-                      updateContent((prev) => ({
+                      updateSection("about", (prev) => ({
                         ...prev,
                         about: {
                           ...prev.about,
@@ -479,41 +633,45 @@ export default function ContentEditor({
               ))}
             </div>
           </div>
-        </div>
-      </section>
+              </div>
+            </section>
+          )}
 
-      {/* Experience */}
-      <EditableExperience
-        experience={experience}
-        update={(items) =>
-          updateContent((prev) => ({
-            ...prev,
-            experience: { ...prev.experience, items },
-          }))
-        }
-        updateHeading={(heading) =>
-          updateContent((prev) => ({
-            ...prev,
-            experience: { ...prev.experience, heading },
-          }))
-        }
-      />
+          {/* Experience */}
+          {activeSection === "experience" && (
+            <EditableExperience
+              experience={experience}
+              update={(items) =>
+                updateSection("experience", (prev) => ({
+                  ...prev,
+                  experience: { ...prev.experience, items },
+                }))
+              }
+              updateHeading={(heading) =>
+                updateSection("experience", (prev) => ({
+                  ...prev,
+                  experience: { ...prev.experience, heading },
+                }))
+              }
+            />
+          )}
 
-      {/* Projects */}
-      <section className={sectionCardClass}>
-        <div className="border-b border-slate-800 px-6 py-5">
-          <h2 className="text-lg font-semibold text-white">Projects</h2>
-          <p className="text-xs text-slate-400">
-            Manage the featured case studies, tech stacks, media, and CTAs.
-          </p>
-        </div>
-        <div className="space-y-6 px-6 py-6">
+          {/* Projects */}
+          {activeSection === "projects" && (
+            <section className={sectionCardClass}>
+              <div className="border-b border-slate-800 px-6 py-5">
+                <h2 className="text-lg font-semibold text-white">Projects</h2>
+                <p className="text-xs text-slate-400">
+                  Manage the featured case studies, tech stacks, media, and CTAs.
+                </p>
+              </div>
+              <div className="space-y-6 px-6 py-6">
           <Field label="Section heading">
             <input
               className={inputClass}
               value={projects.heading}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("projects", (prev) => ({
                   ...prev,
                   projects: { ...prev.projects, heading: e.target.value },
                 }))
@@ -526,7 +684,7 @@ export default function ContentEditor({
               rows={3}
               value={projects.subheading}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("projects", (prev) => ({
                   ...prev,
                   projects: { ...prev.projects, subheading: e.target.value },
                 }))
@@ -540,7 +698,7 @@ export default function ContentEditor({
               <button
                 type="button"
                 onClick={() =>
-                  updateContent((prev) => ({
+                  updateSection("projects", (prev) => ({
                     ...prev,
                     projects: {
                       ...prev.projects,
@@ -568,7 +726,7 @@ export default function ContentEditor({
                 key={`${project.title}-${index}`}
                 project={project}
                 onChange={(next) =>
-                  updateContent((prev) => ({
+                  updateSection("projects", (prev) => ({
                     ...prev,
                     projects: {
                       ...prev.projects,
@@ -579,7 +737,7 @@ export default function ContentEditor({
                   }))
                 }
                 onRemove={() =>
-                  updateContent((prev) => ({
+                  updateSection("projects", (prev) => ({
                     ...prev,
                     projects: {
                       ...prev.projects,
@@ -590,24 +748,26 @@ export default function ContentEditor({
               />
             ))}
           </div>
-        </div>
-      </section>
+              </div>
+            </section>
+          )}
 
-      {/* Skills */}
-      <section className={sectionCardClass}>
-        <div className="border-b border-slate-800 px-6 py-5">
-          <h2 className="text-lg font-semibold text-white">Skills</h2>
-          <p className="text-xs text-slate-400">
-            Configure the marquee rows displayed in the skills section.
-          </p>
-        </div>
-        <div className="space-y-6 px-6 py-6">
+          {/* Skills */}
+          {activeSection === "skills" && (
+            <section className={sectionCardClass}>
+              <div className="border-b border-slate-800 px-6 py-5">
+                <h2 className="text-lg font-semibold text-white">Skills</h2>
+                <p className="text-xs text-slate-400">
+                  Configure the marquee rows displayed in the skills section.
+                </p>
+              </div>
+              <div className="space-y-6 px-6 py-6">
           <Field label="Section heading">
             <input
               className={inputClass}
               value={skills.heading}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("skills", (prev) => ({
                   ...prev,
                   skills: { ...prev.skills, heading: e.target.value },
                 }))
@@ -621,7 +781,7 @@ export default function ContentEditor({
               <button
                 type="button"
                 onClick={() =>
-                  updateContent((prev) => ({
+                  updateSection("skills", (prev) => ({
                     ...prev,
                     skills: {
                       ...prev.skills,
@@ -648,7 +808,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={row.label}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("skills", (prev) => ({
                         ...prev,
                         skills: {
                           ...prev.skills,
@@ -669,7 +829,7 @@ export default function ContentEditor({
                         .split(",")
                         .map((skill) => skill.trim())
                         .filter(Boolean);
-                      updateContent((prev) => ({
+                      updateSection("skills", (prev) => ({
                         ...prev,
                         skills: {
                           ...prev.skills,
@@ -686,7 +846,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={row.reverse ? "true" : "false"}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("skills", (prev) => ({
                         ...prev,
                         skills: {
                           ...prev.skills,
@@ -710,7 +870,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={row.speed ?? 60}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("skills", (prev) => ({
                         ...prev,
                         skills: {
                           ...prev.skills,
@@ -727,7 +887,7 @@ export default function ContentEditor({
                 <button
                   type="button"
                   onClick={() =>
-                    updateContent((prev) => ({
+                    updateSection("skills", (prev) => ({
                       ...prev,
                       skills: {
                         ...prev.skills,
@@ -742,24 +902,26 @@ export default function ContentEditor({
               </div>
             ))}
           </div>
-        </div>
-      </section>
+              </div>
+            </section>
+          )}
 
-      {/* Contact */}
-      <section className={sectionCardClass}>
-        <div className="border-b border-slate-800 px-6 py-5">
-          <h2 className="text-lg font-semibold text-white">Contact</h2>
-          <p className="text-xs text-slate-400">
-            Tune the contact form copy, contact cards, and footer badges.
-          </p>
-        </div>
-        <div className="space-y-6 px-6 py-6">
+          {/* Contact */}
+          {activeSection === "contact" && (
+            <section className={sectionCardClass}>
+              <div className="border-b border-slate-800 px-6 py-5">
+                <h2 className="text-lg font-semibold text-white">Contact</h2>
+                <p className="text-xs text-slate-400">
+                  Tune the contact form copy, contact cards, and footer badges.
+                </p>
+              </div>
+              <div className="space-y-6 px-6 py-6">
           <Field label="Heading">
             <input
               className={inputClass}
               value={contact.heading}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("contact", (prev) => ({
                   ...prev,
                   contact: { ...prev.contact, heading: e.target.value },
                 }))
@@ -772,7 +934,7 @@ export default function ContentEditor({
               rows={3}
               value={contact.subheading}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("contact", (prev) => ({
                   ...prev,
                   contact: { ...prev.contact, subheading: e.target.value },
                 }))
@@ -786,7 +948,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={contact.submitLabel}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("contact", (prev) => ({
                     ...prev,
                     contact: { ...prev.contact, submitLabel: e.target.value },
                   }))
@@ -798,7 +960,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={contact.sendingLabel}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("contact", (prev) => ({
                     ...prev,
                     contact: { ...prev.contact, sendingLabel: e.target.value },
                   }))
@@ -810,7 +972,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={contact.successLabel}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("contact", (prev) => ({
                     ...prev,
                     contact: { ...prev.contact, successLabel: e.target.value },
                   }))
@@ -822,7 +984,7 @@ export default function ContentEditor({
                 className={inputClass}
                 value={contact.errorLabel}
                 onChange={(e) =>
-                  updateContent((prev) => ({
+                  updateSection("contact", (prev) => ({
                     ...prev,
                     contact: { ...prev.contact, errorLabel: e.target.value },
                   }))
@@ -836,7 +998,7 @@ export default function ContentEditor({
               className={inputClass}
               value={contact.successMessage}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("contact", (prev) => ({
                   ...prev,
                   contact: { ...prev.contact, successMessage: e.target.value },
                 }))
@@ -849,7 +1011,7 @@ export default function ContentEditor({
               className={inputClass}
               value={contact.policyNote}
               onChange={(e) =>
-                updateContent((prev) => ({
+                updateSection("contact", (prev) => ({
                   ...prev,
                   contact: { ...prev.contact, policyNote: e.target.value },
                 }))
@@ -863,7 +1025,7 @@ export default function ContentEditor({
               <button
                 type="button"
                 onClick={() =>
-                  updateContent((prev) => ({
+                  updateSection("contact", (prev) => ({
                     ...prev,
                     contact: {
                       ...prev.contact,
@@ -890,7 +1052,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={card.title}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("contact", (prev) => ({
                         ...prev,
                         contact: {
                           ...prev.contact,
@@ -907,7 +1069,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={card.value}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("contact", (prev) => ({
                         ...prev,
                         contact: {
                           ...prev.contact,
@@ -924,7 +1086,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={card.href}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("contact", (prev) => ({
                         ...prev,
                         contact: {
                           ...prev.contact,
@@ -941,7 +1103,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={card.external ? "true" : "false"}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("contact", (prev) => ({
                         ...prev,
                         contact: {
                           ...prev.contact,
@@ -961,7 +1123,7 @@ export default function ContentEditor({
                 <button
                   type="button"
                   onClick={() =>
-                    updateContent((prev) => ({
+                    updateSection("contact", (prev) => ({
                       ...prev,
                       contact: {
                         ...prev.contact,
@@ -983,7 +1145,7 @@ export default function ContentEditor({
               <button
                 type="button"
                 onClick={() =>
-                  updateContent((prev) => ({
+                  updateSection("contact", (prev) => ({
                     ...prev,
                     contact: {
                       ...prev.contact,
@@ -1010,7 +1172,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={item.label}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("contact", (prev) => ({
                         ...prev,
                         contact: {
                           ...prev.contact,
@@ -1027,7 +1189,7 @@ export default function ContentEditor({
                     className={inputClass}
                     value={item.value}
                     onChange={(e) =>
-                      updateContent((prev) => ({
+                      updateSection("contact", (prev) => ({
                         ...prev,
                         contact: {
                           ...prev.contact,
@@ -1042,7 +1204,7 @@ export default function ContentEditor({
                 <button
                   type="button"
                   onClick={() =>
-                    updateContent((prev) => ({
+                    updateSection("contact", (prev) => ({
                       ...prev,
                       contact: {
                         ...prev.contact,
@@ -1057,8 +1219,11 @@ export default function ContentEditor({
               </div>
             ))}
           </div>
+              </div>
+            </section>
+          )}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
